@@ -2,6 +2,10 @@
 
 import socket
 import time
+import pickle # for serializing and deserializing objects
+
+
+
 
 HEADERSIZE = 10
 
@@ -22,16 +26,10 @@ while True:
     clientsocket, address = s.accept() # accept returns a tuple of two values: a new socket object representing the connection, and the address of the client
     print(f"Connection from {address} has been established!")
     
-    msg = "Welcome to the server!"
-    msg = f'{len(msg):<{HEADERSIZE}}' + msg 
+    d = {1: "Hey", 2: "There"}
+    msg = pickle.dumps(d) # serialize the object # already in bytes
 
-    # send a message to the client socket
-    clientsocket.send(bytes(msg, "utf-8"))
+    msg = bytes(f"{len(msg):<{HEADERSIZE}}", "utf-8") + msg # add the header to the message in bytes
 
-    while True: # send the time every 3 seconds
-        time.sleep(3)
-        msg = f"The time is! {time.time()}"
-        msg = f'{len(msg):<{HEADERSIZE}}' + msg 
-        clientsocket.send(bytes(msg, "utf-8"))
-        
-        
+    clientsocket.send(msg) # send a message to the client socket in bytes
+
